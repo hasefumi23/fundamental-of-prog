@@ -18,3 +18,17 @@ let hyouji ekimei = match ekimei with
 (* テスト *)
 let test1 = hyouji {kanji = "佐賀"; kana = "さが"; romaji = "saga"; shozoku = "佐賀線"} = "佐賀線、佐賀(さが)"
 let test2 = hyouji {kanji = "福岡"; kana = "ふくおか"; romaji = "fukuoka"; shozoku = "九州線"} = "九州線、福岡(ふくおか)"
+
+(* 駅間 *)
+type ekikan_t = {
+  kiten : string; (* 起点 *)
+  shuten : string; (* 終点 *)
+  keiyu : string; (* 経由 *)
+  kyori : float; (* 距離 *)
+  jikan : int; (* 時間 *)
+}
+
+(* let lis = "sunday" :: "monday" :: "tuesday" :: [] *)
+(* match [1; 2; 3] with 
+  [] -> 0
+| first :: rest -> first ;; *)
