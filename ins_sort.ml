@@ -14,12 +14,7 @@ let test4 = insert [5; 10; 20] 3 = [3; 5; 10; 20]
 (* ins_sort : int list -> int list *)
 let rec ins_sort lst = match lst with
     [] -> []
-  | first :: rest -> match rest with
-      [] -> [first]
-    | second :: second_rest -> if first > second then ins_sort (insert rest first)
-                                                 else match second_rest with
-        [] -> [first; second]
-      | third :: third_rest -> 
+  | first :: rest -> insert (ins_sort rest) first
 
 (* テスト *)
 let test1 = ins_sort [] = []
