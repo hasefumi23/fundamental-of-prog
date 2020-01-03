@@ -10,4 +10,5 @@ let rec equal_length lst1 lst2 = match (lst1, lst2) with
 let test1 = equal_length [] [] = true
 let test2 = equal_length [] [1; 2] = false
 let test3 = equal_length [1; 2] [] = false
+let test3 = equal_length [1; 2] [1; 2; 3; 4; 5] = false
 let test4 = equal_length [1; 3] [2; 4] = true
