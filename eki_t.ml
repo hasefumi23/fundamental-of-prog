@@ -28,7 +28,8 @@ let rec shokika eki_list kiten = match eki_list with
     [] -> []
   | first :: rest -> match first with
       {namae = n; saitan_kyori = s; temae_list = t} ->
-      if n = kiten then {namae = n; saitan_kyori = 0.; temae_list = n :: []} :: shokika rest kiten
+      if n = kiten then
+        {namae = n; saitan_kyori = 0.; temae_list = n :: []} :: shokika rest kiten
       else first :: shokika rest kiten
 
 (* テスト *)
