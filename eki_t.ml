@@ -13,7 +13,7 @@ type ekimei_t = {
 
 (* 目的: ekimei_t 型のリストを受け取ったら、その駅名を使って eki_t 型のリストを作る *)
 (* make_eki_list : ekimei_t list -> eki_t list *)
-let rec make_eki_list ekimei_list = match ekimei_list with
+let rec make_eki_list make_ekimei_list = match make_ekimei_list with
     [] -> []
   | {kanji = k; kana = ka; romaji = r; shozoku = s} :: rest ->
       {namae = k; saitan_kyori = infinity; temae_list = []} :: make_eki_list rest
@@ -35,3 +35,30 @@ let rec shokika eki_list kiten = match eki_list with
 (* テスト *)
 let test3 = shokika [] "代々木上原" = []
 let test4 = shokika [{namae = "代々木上原"; saitan_kyori = infinity; temae_list = []}; {namae = "代々木公園"; saitan_kyori = infinity; temae_list = []}] "代々木上原" = [{namae = "代々木上原"; saitan_kyori = 0.; temae_list = ["代々木上原"]}; {namae = "代々木公園"; saitan_kyori = infinity; temae_list = []}]
+
+(* 目的: ekimei_t 型のリストを受け取ったら、それをひらがなの順に整列し、さらに駅の重複を取り除いた ekimei_t 型のリストを返す *)
+(* seiretsu : ekimei_t list -> ekimei_t list *)
+let rec insert lst n = match lst with
+    [] -> [n]
+  | first :: rest -> match first with
+      {kanji = k; kana = ka; romaji = r; shozoku = s} -> match n with
+      {kanji = nk; kana = nka; romaji = nr; shozoku = ns} ->
+      if ka = nka then (first :: rest)
+      else if ka > nka then (n :: first :: rest)
+      else (first :: insert rest n)
+
+let rec seiretsu ekimei_lst = match ekimei_lst with
+    [] -> []
+  | first :: rest -> insert (seiretsu rest) first
+
+let test5 = seiretsu [] = []
+let test6 = seiretsu [
+  {kanji="池袋"; kana="いけぶくろ"; romaji="ikebukuro"; shozoku="丸ノ内線"};
+  {kanji="代々木上原"; kana="よよぎうえはら"; romaji="yoyogiuehara"; shozoku="千代田線"};
+  {kanji="代々木公園"; kana="よよぎこうえん"; romaji="yoyogikouen"; shozoku="千代田線"};
+  {kanji="池袋"; kana="いけぶくろ"; romaji="ikebukuro"; shozoku="有楽町線"};
+] = [
+  {kanji="池袋"; kana="いけぶくろ"; romaji="ikebukuro"; shozoku="有楽町線"};
+  {kanji="代々木上原"; kana="よよぎうえはら"; romaji="yoyogiuehara"; shozoku="千代田線"};
+  {kanji="代々木公園"; kana="よよぎこうえん"; romaji="yoyogikouen"; shozoku="千代田線"};
+]
