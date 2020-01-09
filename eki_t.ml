@@ -18,6 +18,10 @@ let rec make_eki_list make_ekimei_list = match make_ekimei_list with
   | {kanji = k; kana = ka; romaji = r; shozoku = s} :: rest ->
       {namae = k; saitan_kyori = infinity; temae_list = []} :: make_eki_list rest
 
+let make_eki_list eki_list =
+  let convert {kanji = k; kana = ka; romaji = r; shozoku = s} = {namae = k; saitan_kyori = infinity; temae_list = []} in
+    List.map convert eki_list
+
 (* テスト *)
 let test1 = make_eki_list [] = []
 let test2 = make_eki_list [{kanji="代々木上原"; kana="よよぎうえはら"; romaji="yoyogiuehara"; shozoku="千代田線"}; {kanji="代々木公園"; kana="よよぎこうえん"; romaji="yoyogikouen"; shozoku="千代田線"};] = [{namae="代々木上原"; saitan_kyori=infinity; temae_list=[]}; {namae="代々木公園"; saitan_kyori=infinity; temae_list=[]}]
@@ -62,3 +66,33 @@ let test6 = seiretsu [
   {kanji="代々木上原"; kana="よよぎうえはら"; romaji="yoyogiuehara"; shozoku="千代田線"};
   {kanji="代々木公園"; kana="よよぎこうえん"; romaji="yoyogikouen"; shozoku="千代田線"};
 ]
+
+let make_eki_list eki_list =
+  let convert {kanji = k; kana = ka; romaji = r; shozoku = s} = {namae = k; saitan_kyori = infinity; temae_list = []} in
+    List.map convert eki_list
+
+(* テスト *)
+let test11 = make_eki_list [] = []
+let test12 = make_eki_list [{kanji="代々木上原"; kana="よよぎうえはら"; romaji="yoyogiuehara"; shozoku="千代田線"}; {kanji="代々木公園"; kana="よよぎこうえん"; romaji="yoyogikouen"; shozoku="千代田線"};] = [{namae="代々木上原"; saitan_kyori=infinity; temae_list=[]}; {namae="代々木公園"; saitan_kyori=infinity; temae_list=[]}]
+
+let shokika eki_list kiten = let shoki eki = match eki with
+  {namae = n; saitan_kyori = _; temae_list = _} ->
+  if n = kiten then {namae = n; saitan_kyori = 0.; temae_list = n :: []}
+  else eki in List.map shoki eki_list
+
+(* テスト *)
+let test13 = shokika [] "代々木上原" = []
+let test14 = shokika [
+  {namae = "代々木上原"; saitan_kyori = infinity; temae_list = []};
+  {namae = "代々木公園"; saitan_kyori = infinity; temae_list = []}] "代々木上原"
+= [
+  {namae = "代々木上原"; saitan_kyori = 0.; temae_list = ["代々木上原"]};
+  {namae = "代々木公園"; saitan_kyori = infinity; temae_list = []}
+]
+
+(* make_initial_eki_list : ekimei_t list string *)
+let make_initial_eki_list ekimei_list kiten = let shoki ekimei = match ekimei with
+  {kanji = k; kana = _; romaji = _; shozoku = _} ->
+    if k = kiten then {namae = k; saitan_kyori = 0.; temae_list = k :: []}
+    else {namae = k; saitan_kyori = infinity; temae_list = []} in
+      List.map shoki ekimei_list
