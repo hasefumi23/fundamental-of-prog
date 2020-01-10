@@ -53,21 +53,22 @@ let saitan_wo_bunri lst =
             let rest_eki_list = List.filter (fun {namae = com_n; saitan_kyori = con_s; temae_list = con_t} -> min_n != com_n || min_s != con_s || min_t != con_t) lst in
               (min_eki, rest_eki_list)
 
-let saitan_wo_bunri lst = let comp_eki first rest_result = match first with
-  {namae = f_n; saitan_kyori = f_s; temae_list = f_t} -> match rest_result with
-    (rest_eki, rest_list) -> match rest_eki with
-    {namae = r_n; saitan_kyori = r_s; temae_list = r_t} ->
-      if f_s < r_s then (first, rest_list :: [])
-      else (rest_list, first :: []) in
-        List.fold_right comp_eki lst ({namae = ""; saitan_kyori = infinity; temae_list = []}, [])
+let saitan_wo_bunri lst = match lst with
+    [] -> ({namae = ""; saitan_kyori = infinity; temae_list = []}, [])
+  | first :: rest -> let comp_eki first_eki rest_result = match first_eki with
+    {namae = _; saitan_kyori = f_s; temae_list = _} -> match rest_result with
+      (rest_eki, rest_list) -> match rest_eki with
+      {namae = _; saitan_kyori = r_s; temae_list = _} ->
+        if f_s < r_s then (first_eki, rest_eki :: rest_list)
+        else (rest_eki, first_eki :: rest_list) in
+          List.fold_right comp_eki rest (first, [])
 
 (* テスト *)
 let test1 = saitan_wo_bunri [
+  {namae = "代々木公園"; saitan_kyori = 10.; temae_list = []};
+  {namae = "明治神宮前"; saitan_kyori = 12.2; temae_list = []};
   {namae = "代々木上原"; saitan_kyori = 1.5; temae_list = ["代々木上原"]};
-  {namae = "代々木公園"; saitan_kyori = 10.; temae_list = []};
+] = ({namae = "代々木上原"; saitan_kyori = 1.5; temae_list = ["代々木上原"]}, [
   {namae = "明治神宮前"; saitan_kyori = 12.2; temae_list = []};
-]
-= ({namae = "代々木上原"; saitan_kyori = 1.5; temae_list = ["代々木上原"]}, [
   {namae = "代々木公園"; saitan_kyori = 10.; temae_list = []};
-  {namae = "明治神宮前"; saitan_kyori = 12.2; temae_list = []};
 ])
