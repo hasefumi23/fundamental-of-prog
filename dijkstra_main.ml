@@ -67,14 +67,14 @@ let saitan_wo_bunri lst = match lst with
 (* 目的: ダイクストラのアルゴリズムを実装する *)
 (* dijkstra_main : eki_t list -> ekikan_t list -> eki_t list *)
 let dijkstra_main eki_list ekikan_list =
-  let rec dijkstra kakutei_list mikakutei_list = if mikakutei_list = [] then kakutei_list else match kakutei_list with
+  let rec dijkstra_sub kakutei_list mikakutei_list = if mikakutei_list = [] then kakutei_list else match kakutei_list with
       [] -> []
     | first :: _ -> let updated_list = koushin first mikakutei_list ekikan_list in
       let bunri_pair = saitan_wo_bunri updated_list in
         match bunri_pair with (burni_eki, bunri_eki_list) ->
-          dijkstra (burni_eki :: kakutei_list) bunri_eki_list in match eki_list with
+          dijkstra_sub (burni_eki :: kakutei_list) bunri_eki_list in match eki_list with
             [] -> []
-          | first :: rest -> List.rev (dijkstra [first] rest)
+          | first :: rest -> List.rev (dijkstra_sub [first] rest)
 
 let test1 = dijkstra_main [
   {namae = "代々木上原"; saitan_kyori = 0.; temae_list = ["代々木上原"]};
