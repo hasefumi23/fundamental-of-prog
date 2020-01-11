@@ -184,24 +184,35 @@ let rec get_ekikan_kyori eki1 eki2 ekikan_list = match ekikan_list with
 (* 目的: 直前に確定した駅 p (eki_t 型) と未確定の駅 q (eki_t 型) を受け取って eki_t 型を返す *)
 (* koushin1 : eki_t -> eki_t *)
 let koushin1 p q = match p with
-  {namae = p_n; saitan_kyori = _; temae_list = _} -> match q with
+  {namae = p_n; saitan_kyori = p_kyori; temae_list = p_t} -> match q with
   {namae = q_n; saitan_kyori = q_k; temae_list = q_t} ->
     let q_kyori = get_ekikan_kyori p_n q_n global_ekikan_list in
-      if q_kyori = infinity || q_kyori > q_k then q
-      else {namae = q_n; saitan_kyori = q_kyori; temae_list = q_t}
+      let total_kyori = q_kyori +. p_kyori in
+      if q_kyori = infinity || total_kyori >= q_k then q
+      else {namae = q_n; saitan_kyori = total_kyori; temae_list = q_n :: p_t}
 
 (* テスト *)
-let test1 = koushin1 {namae="佐賀県"; saitan_kyori = infinity; temae_list = []} {namae="営団成増"; saitan_kyori = infinity; temae_list = []}
-  = {namae="営団成増"; saitan_kyori = infinity; temae_list = []}
-let test2 = koushin1 {namae="営団赤塚"; saitan_kyori = infinity; temae_list = []} {namae="営団成増"; saitan_kyori = infinity; temae_list = []}
-  = {namae="営団成増"; saitan_kyori = 1.5; temae_list = []}
+let test1 = koushin1 { namae="佐賀県"; saitan_kyori = infinity; temae_list = [] }
+{ namae="営団成増"; saitan_kyori = infinity; temae_list = [] }
+= { namae="営団成増"; saitan_kyori = infinity; temae_list = [] }
 
-let koushin eki eki_list = List.map (koushin1 eki) eki_list
+(* 正常に eki_t の更新が行われることのテスト *)
+let test2 = koushin1 {namae="代々木公園"; saitan_kyori = 1.; temae_list = ["代々木公園"; "代々木上原"]}
+{namae="明治神宮前"; saitan_kyori = infinity; temae_list = []}
+= {namae="明治神宮前"; saitan_kyori = 2.2; temae_list = ["明治神宮前"; "代々木公園"; "代々木上原"]}
+
+(* 既に比較対象の eki_t が持っている最短距離の方が小さい場合、元の値を維持していることのテスト *)
+let test2 = koushin1 {namae="代々木公園"; saitan_kyori = 1.; temae_list = ["代々木公園"; "代々木上原"]}
+{namae="明治神宮前"; saitan_kyori = 1.5; temae_list = ["佐賀駅"; "代々木公園"; "代々木上原"]}
+= {namae="明治神宮前"; saitan_kyori = 1.5; temae_list = ["佐賀駅"; "代々木公園"; "代々木上原"]}
+
+(* let koushin eki eki_list = List.map (koushin1 eki) eki_list *)
 
 let koushin eki eki_list g_ekikan_list = let koushin1 p q = match p with
-    {namae = p_n; saitan_kyori = _; temae_list = _} -> match q with
-    {namae = q_n; saitan_kyori = q_k; temae_list = q_t} ->
-      let q_kyori = get_ekikan_kyori p_n q_n g_ekikan_list in
-        if q_kyori = infinity || q_kyori > q_k then q
-        else {namae = q_n; saitan_kyori = q_kyori; temae_list = q_t} in
-          List.map (koushin1 eki) eki_list
+  {namae = p_n; saitan_kyori = p_kyori; temae_list = p_t} -> match q with
+  {namae = q_n; saitan_kyori = q_k; temae_list = q_t} ->
+    let q_kyori = get_ekikan_kyori p_n q_n g_ekikan_list in
+      let total_kyori = q_kyori +. p_kyori in
+      if q_kyori = infinity || total_kyori >= q_k then q
+      else {namae = q_n; saitan_kyori = total_kyori; temae_list = q_n :: p_t} in
+        List.map (koushin1 eki) eki_list
