@@ -189,7 +189,6 @@ let koushin1 p q = match p with
     let q_kyori = get_ekikan_kyori p_n q_n global_ekikan_list in
       if q_kyori = infinity || q_kyori > q_k then q
       else {namae = q_n; saitan_kyori = q_kyori; temae_list = q_t}
-(* {namae = "namae"; saitan_kyori = 1.0; temae_list = []} *)
 
 (* テスト *)
 let test1 = koushin1 {namae="佐賀県"; saitan_kyori = infinity; temae_list = []} {namae="営団成増"; saitan_kyori = infinity; temae_list = []}
@@ -198,3 +197,11 @@ let test2 = koushin1 {namae="営団赤塚"; saitan_kyori = infinity; temae_list 
   = {namae="営団成増"; saitan_kyori = 1.5; temae_list = []}
 
 let koushin eki eki_list = List.map (koushin1 eki) eki_list
+
+let koushin eki eki_list g_ekikan_list = let koushin1 p q = match p with
+    {namae = p_n; saitan_kyori = _; temae_list = _} -> match q with
+    {namae = q_n; saitan_kyori = q_k; temae_list = q_t} ->
+      let q_kyori = get_ekikan_kyori p_n q_n g_ekikan_list in
+        if q_kyori = infinity || q_kyori > q_k then q
+        else {namae = q_n; saitan_kyori = q_kyori; temae_list = q_t} in
+          List.map (koushin1 eki) eki_list
