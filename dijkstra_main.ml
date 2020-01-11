@@ -449,4 +449,3 @@ let dijkstra shiten shuten =
 
 let test1 = dijkstra "yoyogiuehara" "ueno"
 let test2 = dijkstra "akasaka" "ueno"
-(* {namae = ""; saitan_kyori = 0.; temae_list = [""]}; *)
