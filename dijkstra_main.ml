@@ -528,7 +528,17 @@ let koushin eki eki_list g_ekikan_list = let koushin1 p q = match p with
       else {namae = q_n; saitan_kyori = total_kyori; temae_list = q_n :: p_t} in
         List.map (koushin1 eki) eki_list
 
-let saitan_wo_bunri lst = match lst with
+(* let old_saitan_wo_bunri lst = match lst with
+    [] -> ({namae = ""; saitan_kyori = infinity; temae_list = []}, [])
+  | first :: rest -> let comp_eki first_eki rest_result = match first_eki with
+    {namae = _; saitan_kyori = f_s; temae_list = _} -> match rest_result with
+      (rest_eki, rest_list) -> match rest_eki with
+      {namae = _; saitan_kyori = r_s; temae_list = _} ->
+        if f_s < r_s then (first_eki, rest_eki :: rest_list)
+        else (rest_eki, first_eki :: rest_list) in
+          List.fold_right comp_eki rest (first, []) *)
+
+let new_saitan_wo_bunri lst = match lst with
     [] -> ({namae = ""; saitan_kyori = infinity; temae_list = []}, [])
   | first :: rest -> let comp_eki first_eki rest_result = match first_eki with
     {namae = _; saitan_kyori = f_s; temae_list = _} -> match rest_result with
@@ -540,18 +550,14 @@ let saitan_wo_bunri lst = match lst with
 
 (* 目的: ダイクストラのアルゴリズムを実装する *)
 (* dijkstra_main : eki_t list -> ekikan_t list -> eki_t list *)
-let dijkstra_main eki_list ekikan_list =
-  let rec dijkstra_sub kakutei_list mikakutei_list =
-    if mikakutei_list = [] then kakutei_list else match kakutei_list with
-      [] -> []
-    | first :: _ -> let updated_list = koushin first mikakutei_list ekikan_list in
-      let bunri_pair = saitan_wo_bunri updated_list in
-        match bunri_pair with (burni_eki, bunri_eki_list) ->
-          dijkstra_sub (burni_eki :: kakutei_list) bunri_eki_list in
-            let first_bunri = saitan_wo_bunri eki_list in match first_bunri with
-              (first_bunri_eki, first_bunri_eki_list) -> List.rev (dijkstra_sub [first_bunri_eki] first_bunri_eki_list)
+let rec dijkstra_main eki_list ekikan_list = match eki_list with
+    [] -> []
+  | first :: rest -> let bunri_pair = new_saitan_wo_bunri (first :: rest) in
+    match bunri_pair with (bunri_eki, bunri_eki_list) ->
+      let updated_list = koushin bunri_eki bunri_eki_list ekikan_list in
+        bunri_eki :: dijkstra_main updated_list ekikan_list
 
-let test1 = dijkstra_main [
+let test201 = dijkstra_main [
   {namae = "代々木上原"; saitan_kyori = 0.; temae_list = ["代々木上原"]};
   {namae = "代々木公園"; saitan_kyori = infinity; temae_list = []};
   {namae = "明治神宮前"; saitan_kyori = infinity; temae_list = []};
@@ -564,7 +570,7 @@ let test1 = dijkstra_main [
   {namae = "表参道"; saitan_kyori = 3.1; temae_list = ["表参道"; "明治神宮前"; "代々木公園"; "代々木上原"]}
 ]
 
-(* --- ダイクストラの完全実装 --- *)
+(* --- ダイクストラの完全実装 ---
 
 (* 目的: ekimei_t 型のリストを受け取ったら、それをひらがなの順に整列し、さらに駅の重複を取り除いた ekimei_t 型のリストを返す *)
 (* seiretsu : ekimei_t list -> ekimei_t list *)
@@ -606,4 +612,4 @@ let dijkstra shiten shuten =
   List.find (fun {namae = n; saitan_kyori = _; temae_list = _} -> shuten_kanji = n) after_dijkstra
 
 let test1 = dijkstra "yoyogiuehara" "ueno"
-let test2 = dijkstra "akasaka" "ueno"
+let test2 = dijkstra "akasaka" "ueno" *)
