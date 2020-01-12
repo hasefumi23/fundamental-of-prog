@@ -538,21 +538,19 @@ let koushin eki eki_list g_ekikan_list = let koushin1 p q = match p with
         else (rest_eki, first_eki :: rest_list) in
           List.fold_right comp_eki rest (first, []) *)
 
-let new_saitan_wo_bunri lst = match lst with
-    [] -> ({namae = ""; saitan_kyori = infinity; temae_list = []}, [])
-  | first :: rest -> let comp_eki first_eki rest_result = match first_eki with
-    {namae = _; saitan_kyori = f_s; temae_list = _} -> match rest_result with
-      (rest_eki, rest_list) -> match rest_eki with
-      {namae = _; saitan_kyori = r_s; temae_list = _} ->
-        if f_s < r_s then (first_eki, rest_eki :: rest_list)
-        else (rest_eki, first_eki :: rest_list) in
-          List.fold_right comp_eki rest (first, [])
+let new_saitan_wo_bunri first rest = let comp_eki first_eki rest_result = match first_eki with
+  {saitan_kyori = f_s; _} -> match rest_result with
+    (rest_eki, rest_list) -> match rest_eki with
+    {saitan_kyori = r_s; _} ->
+      if f_s < r_s then (first_eki, rest_eki :: rest_list)
+      else (rest_eki, first_eki :: rest_list) in
+        List.fold_right comp_eki rest (first, [])
 
 (* 目的: ダイクストラのアルゴリズムを実装する *)
 (* dijkstra_main : eki_t list -> ekikan_t list -> eki_t list *)
 let rec dijkstra_main eki_list ekikan_list = match eki_list with
     [] -> []
-  | first :: rest -> let bunri_pair = new_saitan_wo_bunri (first :: rest) in
+  | first :: rest -> let bunri_pair = new_saitan_wo_bunri first rest in
     match bunri_pair with (bunri_eki, bunri_eki_list) ->
       let updated_list = koushin bunri_eki bunri_eki_list ekikan_list in
         bunri_eki :: dijkstra_main updated_list ekikan_list
