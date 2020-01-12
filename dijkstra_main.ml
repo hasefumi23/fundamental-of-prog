@@ -1,3 +1,27 @@
+(* --- START: dijkstra を tree を使った実装に書き直すためのコード --- *)
+
+type tmp_ekikan_tree_t = {
+  namae : string; (* 駅名(漢字) *)
+  eki_list : (string * float) list; (* 「上記の駅に直接つながっている駅名(漢字)とその駅までの距離の組」のリスト *)
+}
+
+type ekikan_tree_t = Empty
+                   | Node of ekikan_tree_t * (string * (string * float) list) * ekikan_tree_t
+
+(* テスト *)
+let test1 = Empty
+let test2 = Node (Empty, ("a", [("b", 10.)]), Empty)
+
+(* 「駅名」と「駅名と距離の組のリスト」を受け取ったら、その駅までの距離を返す *)
+(* assoc : string (string * int) list *)
+let rec assoc ekimei list = match list with
+    [] -> infinity
+  | (eki, kyori) :: rest -> if ekimei = eki then kyori else assoc ekimei rest
+
+(* テスト *)
+let test1 = assoc "後楽園" [("新大塚", 1.2); ("後楽園", 1.8)] = 1.8
+let test2 = assoc "池袋" [("新大塚", 1.2); ("後楽園", 1.8)] = infinity
+
 type eki_t = {
   namae  : string; (* 名前 *)
   saitan_kyori : float; (* 最短距離 *)
@@ -18,6 +42,105 @@ type ekimei_t = {
   romaji  : string; (* ローマ字 *)
   shozoku : string; (* 所属線名 *)
 }
+
+let test_tree1
+= Node (
+  Node (
+    Empty,
+    ("新大塚", [("茗荷谷", 1.2)]),
+    Empty
+  ),
+  ("茗荷谷", [("新大塚", 1.2)]),
+  Empty
+)
+
+(* ekikan_tree_t 型の木と ekikan_t 型の駅間を受け取ったら、その情報を挿入した木を返す *)
+(* insert_ekikan : ekikan_tree_t -> ekikan_t -> ekikan_tree_t *)
+let rec ins_ekikan tree comp_ekimei into_ekimei kyori = match tree with
+    Empty -> Node (Empty, (comp_ekimei, [(into_ekimei, kyori)]), Empty)
+  | Node (t1, eki_k, t2) -> match eki_k with
+    (name, ekikan_list) ->
+      if comp_ekimei = name then Node (t1, (name, (into_ekimei, kyori) :: ekikan_list), t2)
+      else if comp_ekimei < name then Node ((ins_ekikan t1 comp_ekimei into_ekimei kyori), eki_k, t2)
+      else Node (t1, eki_k, (ins_ekikan t2 comp_ekimei into_ekimei kyori))
+
+let test10 = ins_ekikan Empty "新大塚" "茗荷谷" 1.2
+= Node (
+  Empty,
+  ("新大塚", [("茗荷谷", 1.2)]),
+  Empty
+)
+let test11 = ins_ekikan test_tree1 "新大塚" "渋谷" 1.3
+= Node (
+  Node (
+    Empty,
+    ("新大塚", [("渋谷", 1.3); ("茗荷谷", 1.2)]),
+    Empty
+  ),
+  ("茗荷谷", [("新大塚", 1.2)]),
+  Empty
+)
+let test12 = ins_ekikan test_tree1 "霞が関" "渋谷" 2.3
+= Node (
+  Node (
+    Empty,
+    ("新大塚", [("茗荷谷", 1.2)]),
+    Empty
+  ),
+  ("茗荷谷", [("新大塚", 1.2)]),
+  Node (
+    Empty,
+    ("霞が関", [("渋谷", 2.3)]),
+    Empty
+  )
+)
+
+let insert_ekikan ekikan tree = match ekikan with
+  {kiten = k; shuten = s; kyori = kyo} ->
+    if k > s then let first_tree = ins_ekikan tree k s kyo in
+      ins_ekikan first_tree s k kyo
+    else let first_tree = ins_ekikan tree s k kyo in
+      ins_ekikan first_tree k s kyo
+
+(* テスト *)
+let test20 = insert_ekikan {kiten = "新大塚"; shuten = "茗荷谷"; kyori = 1.2; keiyu = "keiyu"; jikan = 1} Empty
+= Node (
+  Node (
+    Empty,
+    ("新大塚", [("茗荷谷", 1.2)]),
+    Empty
+  ),
+  ("茗荷谷", [("新大塚", 1.2)]),
+  Empty
+)
+
+(* 目的: ekikan_tree_t 型の木と ekikan_t list 型の駅間のリストを受け取ったら、リストの中に含まれる駅間を全て挿入した木を返す *)
+(* inserts_ekikan : ekikan_tree_t -> ekikan_t list -> ekikan_tree_t *)
+(* let rec inserts_ekikan ekikan_list tree = match ekikan_list with
+    [] -> tree
+  | first :: rest -> let first_tree = insert_ekikan first tree in
+    inserts_ekikan rest first_tree *)
+
+let inserts_ekikan tree ekikan_list = List.fold_right insert_ekikan ekikan_list tree
+
+(* テスト *)
+let test30 = inserts_ekikan Empty [
+  {kiten = "新大塚"; shuten = "茗荷谷"; kyori = 1.2; keiyu = "keiyu"; jikan = 1};
+  {kiten = "新大塚"; shuten = "渋谷"; kyori = 2.2; keiyu = "keiyu"; jikan = 1}
+]
+= Node (
+  Node (
+    Empty,
+    ("新大塚", [("茗荷谷", 1.2); ("渋谷", 2.2)]),
+    Empty
+  ),
+  ("渋谷", [("新大塚", 2.2)]),
+  Node (
+    Empty,
+    ("茗荷谷", [("新大塚", 1.2)]),
+    Empty
+  )
+)
 
 let global_ekimei_list = [
   {kanji="代々木上原"; kana="よよぎうえはら"; romaji="yoyogiuehara"; shozoku="千代田線"};
@@ -353,6 +476,32 @@ let global_ekikan_list = [
   {kiten="営団成増"; shuten="和光市"; keiyu="有楽町線"; kyori=2.1; jikan=3};
 ]
 
+let global_ekikan_tree = inserts_ekikan Empty global_ekikan_list
+
+let rec search eki_tree ekimei1 = match eki_tree with
+  Empty -> []
+| Node (t1, n, t2) -> match n with (n_ekimei, eki_list) ->
+  if ekimei1 = n_ekimei then eki_list
+  else if ekimei1 < n_ekimei then search t1 ekimei1
+  else search t2 ekimei1
+
+(* テスト *)
+let test50 = search global_ekikan_tree "六本木"
+= [("広尾", 1.7); ("神谷町", 1.5)]
+
+let new_get_ekikan_kyori ekimei1 ekimei2 ekikan_tree =
+  let eki_list = search ekikan_tree ekimei1 in
+    let ekikan = try List.find (fun (ekimei, _) -> ekimei = ekimei2) eki_list with Not_found -> ("", infinity) in
+      match ekikan with (_, kyori) -> kyori
+
+(* テスト *)
+(* let test1 = new_get_ekikan_kyori "佐賀市" "佐賀市" global_ekikan_tree = infinity *)
+let test102 = new_get_ekikan_kyori "平和台" "営団赤塚" global_ekikan_tree = 1.8
+let test103 = new_get_ekikan_kyori "営団成増" "和光市" global_ekikan_tree = 2.1
+let test104 = new_get_ekikan_kyori "六本木" "神谷町" global_ekikan_tree = 1.5
+
+(* --- END: dijkstra を tree を使った実装に書き直すためのコード --- *)
+
 let rec get_ekikan_kyori eki1 eki2 ekikan_list = match ekikan_list with
     [] -> infinity
   | {kiten = k; shuten = s; keiyu = _; kyori = kyo; jikan = _} :: rest ->
@@ -361,10 +510,19 @@ let rec get_ekikan_kyori eki1 eki2 ekikan_list = match ekikan_list with
 
 (* 目的: 直前に確定した駅 p (eki_t 型) と未確定の駅 q (eki_t 型) のリストを受け取って eki_t 型のリストを返す *)
 (* FIXME: ここ直前に確定した駅の距離を足す必要がある気がする *)
-let koushin eki eki_list g_ekikan_list = let koushin1 p q = match p with
+let old_koushin eki eki_list g_ekikan_list = let koushin1 p q = match p with
   {namae = p_n; saitan_kyori = p_kyori; temae_list = p_t} -> match q with
   {namae = q_n; saitan_kyori = q_k; temae_list = q_t} ->
     let q_kyori = get_ekikan_kyori p_n q_n g_ekikan_list in
+      let total_kyori = q_kyori +. p_kyori in
+      if q_kyori = infinity || total_kyori >= q_k then q
+      else {namae = q_n; saitan_kyori = total_kyori; temae_list = q_n :: p_t} in
+        List.map (koushin1 eki) eki_list
+
+let koushin eki eki_list g_ekikan_list = let koushin1 p q = match p with
+  {namae = p_n; saitan_kyori = p_kyori; temae_list = p_t} -> match q with
+  {namae = q_n; saitan_kyori = q_k; temae_list = q_t} ->
+    let q_kyori = new_get_ekikan_kyori p_n q_n global_ekikan_tree in
       let total_kyori = q_kyori +. p_kyori in
       if q_kyori = infinity || total_kyori >= q_k then q
       else {namae = q_n; saitan_kyori = total_kyori; temae_list = q_n :: p_t} in
