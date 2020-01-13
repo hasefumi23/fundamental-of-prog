@@ -163,3 +163,17 @@ let test22 = insert test_tree_left_red_left_red "fourth" 200
     Empty)
   )
 )
+
+(* 空の赤黒木 *)
+let empty = Empty
+
+(* search : rb_tree_t key *)
+(* 見つからなかったら例外 Not_found を起こす *)
+let rec search tree key = match tree with
+    Empty -> raise Not_found
+  | Node (t1, (n_key, n_value, _), t2) ->
+    if key = n_key then n_value
+    else if key < n_key then search t1 key
+    else search t2 key
+
+let test31 = search test_tree_left_red_left_red "node_x"
