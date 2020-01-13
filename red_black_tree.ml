@@ -45,10 +45,10 @@ Node (
   Node (
     Node (
       Empty,
-      ("node_z", 0, Red),
+      ("node_y", 0, Red),
       Empty
     ),
-    ("node_y", 0, Red),
+    ("node_z", 0, Red),
     Empty
   )
 )
@@ -110,5 +110,6 @@ let balance tree = match tree with
 let test1 = balance test_tree_left_red_left_red
 let test2 = balance test_tree_left_red_right_red
 let test3 = balance test_tree_right_red_left_red
+= correct_tree
 let test4 = balance test_tree_right_red_right_red
 = correct_tree
