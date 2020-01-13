@@ -13,13 +13,13 @@ Node(
   Node (
     Node (
       Empty,
-      ("first", 1, Red),
+      ("node_x", 1, Red),
       Empty
     ),
-    ("first", 1, Red),
+    ("node_y", 1, Red),
     Empty
   ),
-  ("first", 0, Black),
+  ("node_z", 0, Black),
   Empty
 )
 
@@ -27,28 +27,28 @@ let test_tree_left_red_right_red =
 Node(
   Node (
     Empty,
-    ("first", 1, Red),
+    ("node_x", 1, Red),
     Node (
       Empty,
-      ("first", 1, Red),
+      ("node_y", 1, Red),
       Empty
     )
   ),
-  ("first", 0, Black),
+  ("node_z", 0, Black),
   Empty
 )
 
 let test_tree_right_red_left_red =
-Node(
+Node (
   Empty,
-  ("first", 0, Black),
+  ("node_x", 0, Black),
   Node (
     Node (
       Empty,
-      ("first", 1, Red),
+      ("node_z", 0, Red),
       Empty
     ),
-    ("first", 1, Red),
+    ("node_y", 0, Red),
     Empty
   )
 )
@@ -56,13 +56,13 @@ Node(
 let test_tree_right_red_right_red =
 Node(
   Empty,
-  ("first", 0, Black),
+  ("node_x", 0, Black),
   Node (
     Empty,
-    ("first", 0, Red),
+    ("node_y", 0, Red),
     Node (
       Empty,
-      ("first", 0, Red),
+      ("node_z", 0, Red),
       Empty
     )
   )
@@ -72,13 +72,13 @@ let correct_tree =
 Node(
   Node (
     Empty,
-    ("first", 0, Black),
+    ("node_x", 0, Black),
     Empty
   ),
-  ("first", 0, Red),
+  ("node_y", 0, Red),
   Node (
     Empty,
-    ("first", 0, Black),
+    ("node_z", 0, Black),
     Empty
   )
 )
