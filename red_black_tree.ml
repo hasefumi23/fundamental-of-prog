@@ -88,8 +88,8 @@ Node(
 let balance tree = match tree with
     Empty -> Empty
   (* | Node (Node (Node ( _, (_, _, Red), _), (_, _, Red), _), (_, _, Black), _)
-  | Node (Node (_, (_, _, Red), Node ( _, (_, _, Red), _)), (_, _, Black), _)
-  | Node (_, (_, _, Black), Node (Node ( _, (_, _, Red), _), (_, _, Red), _)) *)
+  | Node (Node (_, (_, _, Red), Node ( _, (_, _, Red), _)), (_, _, Black), _) *)
+  | Node (node_a, (node_x_key, node_x_val, Black), Node (Node ( node_b, (node_y_key, node_y_val, Red), node_c), (node_z_key, node_z_val, Red), node_d))
   | Node (node_a, (node_x_key, node_x_val, Black), Node (node_b, (node_y_key, node_y_val, Red), Node (node_c, (node_z_key, node_z_val, Red), node_d))) ->
     Node (
       Node (
