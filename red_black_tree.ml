@@ -13,13 +13,13 @@ Node(
   Node (
     Node (
       Empty,
-      ("node_x", 0, Red),
+      ("node_x", 50, Red),
       Empty
     ),
-    ("node_y", 0, Red),
+    ("node_y", 100, Red),
     Empty
   ),
-  ("node_z", 0, Black),
+  ("node_z", 150, Black),
   Empty
 )
 
@@ -27,28 +27,28 @@ let test_tree_left_red_right_red =
 Node(
   Node (
     Empty,
-    ("node_x", 0, Red),
+    ("node_x", 50, Red),
     Node (
       Empty,
-      ("node_y", 0, Red),
+      ("node_y", 100, Red),
       Empty
     )
   ),
-  ("node_z", 0, Black),
+  ("node_z", 150, Black),
   Empty
 )
 
 let test_tree_right_red_left_red =
 Node (
   Empty,
-  ("node_x", 0, Black),
+  ("node_x", 50, Black),
   Node (
     Node (
       Empty,
-      ("node_y", 0, Red),
+      ("node_y", 100, Red),
       Empty
     ),
-    ("node_z", 0, Red),
+    ("node_z", 150, Red),
     Empty
   )
 )
@@ -56,13 +56,13 @@ Node (
 let test_tree_right_red_right_red =
 Node(
   Empty,
-  ("node_x", 0, Black),
+  ("node_x", 50, Black),
   Node (
     Empty,
-    ("node_y", 0, Red),
+    ("node_y", 100, Red),
     Node (
       Empty,
-      ("node_z", 0, Red),
+      ("node_z", 150, Red),
       Empty
     )
   )
@@ -72,13 +72,13 @@ let correct_tree =
 Node(
   Node (
     Empty,
-    ("node_x", 0, Black),
+    ("node_x", 50, Black),
     Empty
   ),
-  ("node_y", 0, Red),
+  ("node_y", 100, Red),
   Node (
     Empty,
-    ("node_z", 0, Black),
+    ("node_z", 150, Black),
     Empty
   )
 )
@@ -115,3 +115,6 @@ let test3 = balance test_tree_right_red_left_red
 = correct_tree
 let test4 = balance test_tree_right_red_right_red
 = correct_tree
+
+(* 目的: 赤黒木とキーと値を受け取ったら、それを挿入した赤黒木を返す関数。キーが存在したらうわがく *)
+(* insert : rb_tree_t -> rb_tree_t *)
