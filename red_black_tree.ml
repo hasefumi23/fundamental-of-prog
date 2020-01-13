@@ -104,7 +104,7 @@ let balance tree = match tree with
         node_d
       )
     )
-  | _ -> Empty
+  | _ -> tree
   (* | (t1, n, t2) -> "Empty-2" *)
 
 let test1 = balance test_tree_left_red_left_red
