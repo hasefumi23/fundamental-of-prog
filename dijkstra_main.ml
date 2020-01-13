@@ -491,7 +491,7 @@ let test50 = search global_ekikan_tree "六本木"
 
 let new_get_ekikan_kyori ekimei1 ekimei2 ekikan_tree =
   let eki_list = search ekikan_tree ekimei1 in
-    let ekikan = try List.find (fun (ekimei, _) -> ekimei = ekimei2) eki_list with Not_found -> ("", infinity) in
+    let ekikan = List.find (fun (ekimei, _) -> ekimei = ekimei2) eki_list in
       match ekikan with (_, kyori) -> kyori
 
 (* テスト *)
@@ -519,12 +519,12 @@ let old_koushin eki eki_list g_ekikan_list = let koushin1 p q = match p with
       else {namae = q_n; saitan_kyori = total_kyori; temae_list = q_n :: p_t} in
         List.map (koushin1 eki) eki_list
 
-let koushin eki eki_list g_ekikan_list = let koushin1 p q = match p with
+let koushin eki eki_list g_ekikan_tree = let koushin1 p q = match p with
   {namae = p_n; saitan_kyori = p_kyori; temae_list = p_t} -> match q with
-  {namae = q_n; saitan_kyori = q_k; temae_list = q_t} ->
-    let q_kyori = new_get_ekikan_kyori p_n q_n global_ekikan_tree in
+  {namae = q_n; saitan_kyori = q_k; _} ->
+    let q_kyori = try new_get_ekikan_kyori p_n q_n g_ekikan_tree with Not_found -> q_k in
       let total_kyori = q_kyori +. p_kyori in
-      if q_kyori = infinity || total_kyori >= q_k then q
+      if total_kyori >= q_k then q
       else {namae = q_n; saitan_kyori = total_kyori; temae_list = q_n :: p_t} in
         List.map (koushin1 eki) eki_list
 
@@ -560,7 +560,7 @@ let test201 = dijkstra_main [
   {namae = "代々木公園"; saitan_kyori = infinity; temae_list = []};
   {namae = "明治神宮前"; saitan_kyori = infinity; temae_list = []};
   {namae = "表参道"; saitan_kyori = infinity; temae_list = []}]
-  global_ekikan_list
+  global_ekikan_tree
 = [
   {namae = "代々木上原"; saitan_kyori = 0.; temae_list = ["代々木上原"]};
   {namae = "代々木公園"; saitan_kyori = 1.0; temae_list = ["代々木公園"; "代々木上原"]};

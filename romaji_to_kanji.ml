@@ -179,8 +179,10 @@ let global_ekimei_list = [
 {kanji="和光市"; kana="わこうし"; romaji="wakousi"; shozoku="有楽町線"};
 ]
 
+exception No_such_station of string
+
 let rec romaji_to_kanji romaji ekimei_list = match ekimei_list with
-    [] -> ""
+    [] -> raise (No_such_station (romaji))
   | first :: rest -> match first with
   {kanji = k; kana = _; romaji = r; shozoku = _} ->
   if romaji = r then k
