@@ -59,10 +59,10 @@ Node(
   ("first", 0, Black),
   Node (
     Empty,
-    ("first", 1, Red),
+    ("first", 0, Red),
     Node (
       Empty,
-      ("first", 1, Red),
+      ("first", 0, Red),
       Empty
     )
   )
@@ -72,13 +72,13 @@ let correct_tree =
 Node(
   Node (
     Empty,
-    ("first", 1, Red),
+    ("first", 0, Black),
     Empty
   ),
-  ("first", 0, Black),
+  ("first", 0, Red),
   Node (
     Empty,
-    ("first", 1, Red),
+    ("first", 0, Black),
     Empty
   )
 )
@@ -90,11 +90,25 @@ let balance tree = match tree with
   (* | Node (Node (Node ( _, (_, _, Red), _), (_, _, Red), _), (_, _, Black), _)
   | Node (Node (_, (_, _, Red), Node ( _, (_, _, Red), _)), (_, _, Black), _)
   | Node (_, (_, _, Black), Node (Node ( _, (_, _, Red), _), (_, _, Red), _)) *)
-  | Node (_, (_, _, Black), Node (_, (_, _, Red), Node ( _, (_, _, Red), _))) -> Empty
+  | Node (node_a, (node_x_key, node_x_val, Black), Node (node_b, (node_y_key, node_y_val, Red), Node (node_c, (node_z_key, node_z_val, Red), node_d))) ->
+    Node (
+      Node (
+        node_a,
+        (node_x_key, node_x_val, Black),
+        node_b
+      ),
+      (node_y_key, node_y_val, Red),
+      Node (
+        node_c,
+        (node_z_key, node_z_val, Black),
+        node_d
+      )
+    )
   | _ -> Empty
   (* | (t1, n, t2) -> "Empty-2" *)
 
 let test1 = balance test_tree_left_red_left_red
 let test2 = balance test_tree_left_red_right_red
 let test3 = balance test_tree_right_red_left_red
-let test4 = balance test_tree_right_red_right_red = correct_tree
+let test4 = balance test_tree_right_red_right_red
+= correct_tree
