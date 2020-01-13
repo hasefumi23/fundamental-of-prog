@@ -118,3 +118,48 @@ let test4 = balance test_tree_right_red_right_red
 
 (* 目的: 赤黒木とキーと値を受け取ったら、それを挿入した赤黒木を返す関数。キーが存在したらうわがく *)
 (* insert : rb_tree_t -> rb_tree_t *)
+let rec insert tree key value = match tree with
+    Empty -> Node (Empty, (key, value, Red), Empty)
+  | Node (t1, (n_key, n_value, n_color), t2) ->
+    let new_tree = if key = n_key then Node (t1, (n_key, value, n_color), t2)
+    else if value < n_value then Node (insert t1  key value, (n_key, n_value, n_color), t2)
+    else Node (t1, (n_key, n_value, n_color), insert t2  key value) in
+      if n_color = Black then balance new_tree
+      else new_tree
+
+let test21 = insert test_tree_left_red_left_red "fourth" 25
+= Node (
+  Node (
+    Node (
+      Empty,
+      ("fourth", 25, Red),
+      Empty
+    ),
+    ("node_x", 50, Black), Empty),
+  ("node_y", 100, Red),
+  Node (
+    Empty,
+    ("node_z", 150, Black),
+    Empty
+  )
+)
+
+let test22 = insert test_tree_left_red_left_red "fourth" 200
+= Node (
+  Node (
+    Empty,
+    ("node_x", 50, Black),
+    Empty
+  ),
+  ("node_y", 100, Red),
+  Node (
+    Empty,
+    ("node_z", 150,
+    Black
+  ),
+  Node (
+    Empty,
+    ("fourth", 200, Red),
+    Empty)
+  )
+)
